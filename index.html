@@ -12,15 +12,20 @@
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
+      min-height: 100vh;
+    }
+
+    .center {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px;
     }
 
     .card {
       width: 90%;
-      max-width: 430px;
+      max-width: 440px;
       background: #1f2937;
       padding: 25px;
       border-radius: 20px;
@@ -60,44 +65,15 @@
       cursor: pointer;
     }
 
-    .on {
-      background: #22c55e;
-    }
-
-    .off {
-      background: #ef4444;
-    }
-
-    .restart {
-      background: #f59e0b;
-    }
-
-    .cancel {
-      background: #3b82f6;
-    }
-
-    .now {
-      background: #991b1b;
-    }
-
-    .status {
-      background: #6366f1;
-    }
-
-    .ups {
-      background: #0f766e;
-    }
-
-    .ups-off {
-      background: #6b7280;
-    }
-
-    #mensaje {
-      margin-top: 20px;
-      color: #d1d5db;
-      font-size: 15px;
-      min-height: 25px;
-    }
+    .on { background: #22c55e; }
+    .off { background: #ef4444; }
+    .restart { background: #f59e0b; }
+    .cancel { background: #3b82f6; }
+    .now { background: #991b1b; }
+    .status { background: #6366f1; }
+    .ups { background: #0f766e; }
+    .ups-off { background: #6b7280; }
+    .logout { background: #374151; }
 
     .section-title {
       margin-top: 22px;
@@ -108,73 +84,235 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+
+    #app {
+      display: none;
+      padding: 20px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .panel-card, .log-card {
+      background: #1f2937;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+    }
+
+    .log-card h2 {
+      margin-top: 0;
+    }
+
+    #mensaje {
+      margin-top: 20px;
+      color: #d1d5db;
+      font-size: 15px;
+      min-height: 25px;
+    }
+
+    #estadoActual {
+      background: #111827;
+      border-radius: 14px;
+      padding: 15px;
+      text-align: left;
+      color: #d1d5db;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    #consola {
+      background: #0b1120;
+      color: #d1d5db;
+      border-radius: 14px;
+      padding: 15px;
+      height: 520px;
+      overflow-y: auto;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .log-line {
+      border-bottom: 1px solid #1f2937;
+      padding: 8px 0;
+    }
+
+    .ok { color: #22c55e; }
+    .warn { color: #f59e0b; }
+    .danger { color: #ef4444; }
+    .info { color: #60a5fa; }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      #consola {
+        height: 360px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>Engels Power Guard</h1>
-    <p>Control remoto de mi PC</p>
 
-    <input id="pin" type="password" placeholder="PIN de seguridad" />
+  <!-- LOGIN -->
+  <div id="login" class="center">
+    <div class="card">
+      <h1>Engels Power Guard</h1>
+      <p>Acceso privado</p>
 
-    <div class="section-title">Energía</div>
+      <input id="passwordInput" type="password" placeholder="Contraseña" />
 
-    <button class="on" onclick="enviarComando('ENCENDER_PC')">
-      Encender PC
-    </button>
+      <button class="status" onclick="login()">
+        Entrar
+      </button>
 
-    <button class="off" onclick="enviarComando('APAGAR_PC')">
-      Apagar PC en 60 segundos
-    </button>
+      <div id="loginMensaje"></div>
+    </div>
+  </div>
 
-    <button class="now" onclick="confirmarApagadoAhora()">
-      Apagar ahora
-    </button>
+  <!-- APP -->
+  <div id="app">
+    <div class="layout">
 
-    <button class="cancel" onclick="enviarComando('CANCELAR_APAGADO')">
-      Cancelar apagado
-    </button>
+      <div class="panel-card">
+        <h1>Engels Power Guard</h1>
+        <p>Control remoto de mi PC</p>
 
-    <div class="section-title">Sistema</div>
+        <div class="section-title">Energía</div>
 
-    <button class="restart" onclick="confirmarReinicio()">
-      Reiniciar PC
-    </button>
+        <button class="on" onclick="enviarComando('ENCENDER_PC')">
+          Encender PC
+        </button>
 
-    <button class="status" onclick="enviarComando('ESTADO_PC')">
-      Ver estado
-    </button>
+        <button class="off" onclick="enviarComando('APAGAR_PC')">
+          Apagar PC en 60 segundos
+        </button>
 
-    <div class="section-title">Modo UPS</div>
+        <button class="now" onclick="confirmarApagadoAhora()">
+          Apagar ahora
+        </button>
 
-    <button class="ups" onclick="enviarComando('UPS_ON')">
-      Activar modo UPS automático
-    </button>
+        <button class="cancel" onclick="enviarComando('CANCELAR_APAGADO')">
+          Cancelar apagado
+        </button>
 
-    <button class="ups-off" onclick="enviarComando('UPS_OFF')">
-      Desactivar modo UPS automático
-    </button>
+        <div class="section-title">Sistema</div>
 
-    <div id="mensaje"></div>
+        <button class="restart" onclick="confirmarReinicio()">
+          Reiniciar PC
+        </button>
+
+        <button class="status" onclick="enviarComando('ESTADO_PC')">
+          Ver estado
+        </button>
+
+        <div class="section-title">Modo UPS</div>
+
+        <button class="ups" onclick="enviarComando('UPS_ON')">
+          Activar modo UPS automático
+        </button>
+
+        <button class="ups-off" onclick="enviarComando('UPS_OFF')">
+          Desactivar modo UPS automático
+        </button>
+
+        <div class="section-title">Sesión</div>
+
+        <button class="logout" onclick="logout()">
+          Cerrar sesión
+        </button>
+
+        <div id="mensaje"></div>
+      </div>
+
+      <div class="log-card">
+        <h2>Respuesta del sistema</h2>
+
+        <div id="estadoActual">
+          Estado: esperando información...<br>
+          Última respuesta: ninguna
+        </div>
+
+        <h2>Consola</h2>
+        <div id="consola"></div>
+      </div>
+
+    </div>
   </div>
 
   <script>
+    // =========================
+    // CONFIGURACIÓN
+    // =========================
     const TOPIC = "engels-power-15-priv";
 
-    // Cambia este PIN luego por uno más privado
-    const PIN_CORRECTO = "Engelsg15";
+    // Cambia esta contraseña por una privada
+    const PASSWORD_CORRECTA = "1518";
 
-    async function enviarComando(comando) {
-      const pin = document.getElementById("pin").value;
-      const mensaje = document.getElementById("mensaje");
+    const loginDiv = document.getElementById("login");
+    const appDiv = document.getElementById("app");
+    const consola = document.getElementById("consola");
+    const estadoActual = document.getElementById("estadoActual");
 
-      if (pin !== PIN_CORRECTO) {
-        mensaje.innerText = "PIN incorrecto.";
+    let socket = null;
+
+    // =========================
+    // LOGIN
+    // =========================
+
+    function login() {
+      const password = document.getElementById("passwordInput").value;
+      const loginMensaje = document.getElementById("loginMensaje");
+
+      if (password !== PASSWORD_CORRECTA) {
+        loginMensaje.innerText = "Contraseña incorrecta.";
         return;
       }
 
+      localStorage.setItem("power_guard_logged", "yes");
+
+      loginDiv.style.display = "none";
+      appDiv.style.display = "block";
+
+      iniciarEscucha();
+      agregarLog("Acceso correcto. Panel iniciado.", "ok");
+    }
+
+    function logout() {
+      localStorage.removeItem("power_guard_logged");
+      location.reload();
+    }
+
+    function verificarSesion() {
+      const logged = localStorage.getItem("power_guard_logged");
+
+      if (logged === "yes") {
+        loginDiv.style.display = "none";
+        appDiv.style.display = "block";
+        iniciarEscucha();
+        agregarLog("Sesión restaurada.", "info");
+      }
+    }
+
+    // =========================
+    // ENVIAR COMANDOS
+    // =========================
+
+    async function enviarComando(comando) {
+      const mensaje = document.getElementById("mensaje");
+
       mensaje.innerText = "Enviando comando: " + comando + "...";
+      agregarLog("Comando enviado: " + comando, "info");
 
       try {
         const respuesta = await fetch("https://ntfy.sh/" + TOPIC, {
@@ -186,9 +324,11 @@
           mensaje.innerText = "Comando enviado: " + comando;
         } else {
           mensaje.innerText = "Error enviando comando.";
+          agregarLog("Error enviando comando: " + comando, "danger");
         }
       } catch (error) {
         mensaje.innerText = "No se pudo conectar con ntfy.";
+        agregarLog("No se pudo conectar con ntfy.", "danger");
       }
     }
 
@@ -197,6 +337,7 @@
 
       if (!seguro) {
         document.getElementById("mensaje").innerText = "Apagado inmediato cancelado.";
+        agregarLog("Apagado inmediato cancelado por el usuario.", "warn");
         return;
       }
 
@@ -208,11 +349,124 @@
 
       if (!seguro) {
         document.getElementById("mensaje").innerText = "Reinicio cancelado.";
+        agregarLog("Reinicio cancelado por el usuario.", "warn");
         return;
       }
 
       enviarComando("REINICIAR_PC");
     }
+
+    // =========================
+    // ESCUCHAR RESPUESTAS
+    // =========================
+
+    function iniciarEscucha() {
+      if (socket) return;
+
+      socket = new WebSocket("wss://ntfy.sh/" + TOPIC + "/ws");
+
+      socket.onopen = () => {
+        agregarLog("Conectado a ntfy. Esperando respuestas...", "ok");
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const message = data.message || "";
+
+          procesarMensaje(message);
+        } catch (error) {
+          agregarLog("Mensaje recibido no válido.", "warn");
+        }
+      };
+
+      socket.onclose = () => {
+        agregarLog("Conexión cerrada. Reintentando en 5 segundos...", "warn");
+        socket = null;
+
+        setTimeout(() => {
+          iniciarEscucha();
+        }, 5000);
+      };
+
+      socket.onerror = () => {
+        agregarLog("Error en conexión WebSocket.", "danger");
+      };
+    }
+
+    function procesarMensaje(message) {
+      if (!message) return;
+
+      // Si es JSON enviado por la PC
+      if (message.startsWith("{")) {
+        try {
+          const paquete = JSON.parse(message);
+
+          if (paquete.origen === "PC") {
+            mostrarRespuestaPC(paquete);
+            return;
+          }
+        } catch (error) {
+          agregarLog("No se pudo leer respuesta JSON.", "warn");
+        }
+      }
+
+      // Si es un comando normal
+      if (
+        message === "ENCENDER_PC" ||
+        message === "APAGAR_PC" ||
+        message === "REINICIAR_PC" ||
+        message === "CANCELAR_APAGADO" ||
+        message === "APAGAR_AHORA" ||
+        message === "ESTADO_PC" ||
+        message === "UPS_ON" ||
+        message === "UPS_OFF"
+      ) {
+        agregarLog("ntfy recibió comando: " + message, "info");
+        return;
+      }
+
+      agregarLog("Mensaje recibido: " + message, "info");
+    }
+
+    function mostrarRespuestaPC(paquete) {
+      let clase = "info";
+
+      if (paquete.tipo === "ESTADO") clase = "ok";
+      if (paquete.tipo === "UPS") clase = "warn";
+      if (paquete.tipo === "COMANDO") clase = "info";
+
+      agregarLog(`[${paquete.tipo}] ${paquete.mensaje}`, clase);
+
+      let html = `
+        <strong>Última respuesta:</strong> ${paquete.hora || "Sin hora"}<br>
+        <strong>Tipo:</strong> ${paquete.tipo || "N/A"}<br>
+        <strong>Mensaje:</strong> ${paquete.mensaje || "N/A"}<br>
+      `;
+
+      if (paquete.pc) html += `<strong>PC:</strong> ${paquete.pc}<br>`;
+      if (paquete.ipLocal) html += `<strong>IP local:</strong> ${paquete.ipLocal}<br>`;
+      if (paquete.tiempoEncendida) html += `<strong>Tiempo encendida:</strong> ${paquete.tiempoEncendida}<br>`;
+      if (paquete.memoriaUsada) html += `<strong>RAM usada:</strong> ${paquete.memoriaUsada} / ${paquete.memoriaTotal}<br>`;
+      if (paquete.modoUPS) html += `<strong>Modo UPS:</strong> ${paquete.modoUPS}<br>`;
+      if (paquete.apagadoPorUPS) html += `<strong>Apagado UPS:</strong> ${paquete.apagadoPorUPS}<br>`;
+      if (paquete.segundosSinRed !== undefined) html += `<strong>Segundos sin red:</strong> ${paquete.segundosSinRed}<br>`;
+
+      estadoActual.innerHTML = html;
+    }
+
+    function agregarLog(texto, tipo = "info") {
+      const hora = new Date().toLocaleTimeString();
+
+      const linea = document.createElement("div");
+      linea.className = "log-line " + tipo;
+      linea.textContent = `[${hora}] ${texto}`;
+
+      consola.appendChild(linea);
+      consola.scrollTop = consola.scrollHeight;
+    }
+
+    verificarSesion();
   </script>
 </body>
 </html>
