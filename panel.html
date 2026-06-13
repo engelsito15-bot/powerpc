@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Engels Power Guard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 90%;
+      max-width: 430px;
+      background: #1f2937;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+      font-size: 28px;
+    }
+
+    p {
+      color: #d1d5db;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      margin-bottom: 18px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    button {
+      width: 95%;
+      padding: 16px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    .on {
+      background: #22c55e;
+    }
+
+    .off {
+      background: #ef4444;
+    }
+
+    .restart {
+      background: #f59e0b;
+    }
+
+    .cancel {
+      background: #3b82f6;
+    }
+
+    .now {
+      background: #991b1b;
+    }
+
+    .status {
+      background: #6366f1;
+    }
+
+    .ups {
+      background: #0f766e;
+    }
+
+    .ups-off {
+      background: #6b7280;
+    }
+
+    #mensaje {
+      margin-top: 20px;
+      color: #d1d5db;
+      font-size: 15px;
+      min-height: 25px;
+    }
+
+    .section-title {
+      margin-top: 22px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: #9ca3af;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Engels Power Guard</h1>
+    <p>Control remoto de mi PC</p>
+
+    <input id="pin" type="password" placeholder="PIN de seguridad" />
+
+    <div class="section-title">Energía</div>
+
+    <button class="on" onclick="enviarComando('ENCENDER_PC')">
+      Encender PC
+    </button>
+
+    <button class="off" onclick="enviarComando('APAGAR_PC')">
+      Apagar PC en 60 segundos
+    </button>
+
+    <button class="now" onclick="confirmarApagadoAhora()">
+      Apagar ahora
+    </button>
+
+    <button class="cancel" onclick="enviarComando('CANCELAR_APAGADO')">
+      Cancelar apagado
+    </button>
+
+    <div class="section-title">Sistema</div>
+
+    <button class="restart" onclick="confirmarReinicio()">
+      Reiniciar PC
+    </button>
+
+    <button class="status" onclick="enviarComando('ESTADO_PC')">
+      Ver estado
+    </button>
+
+    <div class="section-title">Modo UPS</div>
+
+    <button class="ups" onclick="enviarComando('UPS_ON')">
+      Activar modo UPS automático
+    </button>
+
+    <button class="ups-off" onclick="enviarComando('UPS_OFF')">
+      Desactivar modo UPS automático
+    </button>
+
+    <div id="mensaje"></div>
+  </div>
+
+  <script>
+    const TOPIC = "engels-power-15-priv";
+
+    // Cambia este PIN luego por uno más privado
+    const PIN_CORRECTO = "Engelsg15";
+
+    async function enviarComando(comando) {
+      const pin = document.getElementById("pin").value;
+      const mensaje = document.getElementById("mensaje");
+
+      if (pin !== PIN_CORRECTO) {
+        mensaje.innerText = "PIN incorrecto.";
+        return;
+      }
+
+      mensaje.innerText = "Enviando comando: " + comando + "...";
+
+      try {
+        const respuesta = await fetch("https://ntfy.sh/" + TOPIC, {
+          method: "POST",
+          body: comando
+        });
+
+        if (respuesta.ok) {
+          mensaje.innerText = "Comando enviado: " + comando;
+        } else {
+          mensaje.innerText = "Error enviando comando.";
+        }
+      } catch (error) {
+        mensaje.innerText = "No se pudo conectar con ntfy.";
+      }
+    }
+
+    function confirmarApagadoAhora() {
+      const seguro = confirm("¿Seguro que quieres apagar la PC AHORA MISMO?");
+
+      if (!seguro) {
+        document.getElementById("mensaje").innerText = "Apagado inmediato cancelado.";
+        return;
+      }
+
+      enviarComando("APAGAR_AHORA");
+    }
+
+    function confirmarReinicio() {
+      const seguro = confirm("¿Seguro que quieres reiniciar la PC?");
+
+      if (!seguro) {
+        document.getElementById("mensaje").innerText = "Reinicio cancelado.";
+        return;
+      }
+
+      enviarComando("REINICIAR_PC");
+    }
+  </script>
+</body>
+</html>
