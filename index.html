@@ -71,8 +71,6 @@
     .cancel { background: #3b82f6; }
     .now { background: #991b1b; }
     .status { background: #6366f1; }
-    .ups { background: #0f766e; }
-    .ups-off { background: #6b7280; }
     .logout { background: #374151; }
 
     .section-title {
@@ -140,6 +138,17 @@
       white-space: pre-wrap;
     }
 
+    .ups-info {
+      background: #0f766e;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      color: white;
+      line-height: 1.5;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
     .log-line {
       border-bottom: 1px solid #1f2937;
       padding: 8px 0;
@@ -164,7 +173,6 @@
 
 <body>
 
-  <!-- LOGIN -->
   <div id="login" class="center">
     <div class="card">
       <h1>Engels Power Guard</h1>
@@ -180,13 +188,17 @@
     </div>
   </div>
 
-  <!-- APP -->
   <div id="app">
     <div class="layout">
 
       <div class="panel-card">
         <h1>Engels Power Guard</h1>
         <p>Control remoto de mi PC</p>
+
+        <div class="ups-info">
+          Modo UPS: siempre activado<br>
+          Si detecta apagón, avisa en Windows y apaga en 20 minutos si no haces nada.
+        </div>
 
         <div class="section-title">Energía</div>
 
@@ -216,16 +228,6 @@
           Ver estado
         </button>
 
-        <div class="section-title">Modo UPS</div>
-
-        <button class="ups" onclick="enviarComando('UPS_ON')">
-          Activar modo UPS automático
-        </button>
-
-        <button class="ups-off" onclick="enviarComando('UPS_OFF')">
-          Desactivar modo UPS automático
-        </button>
-
         <div class="section-title">Sesión</div>
 
         <button class="logout" onclick="logout()">
@@ -251,12 +253,7 @@
   </div>
 
   <script>
-    // =========================
-    // CONFIGURACIÓN
-    // =========================
     const TOPIC = "engels-power-15-priv";
-
-    // Cambia esta contraseña por una privada
     const PASSWORD_CORRECTA = "1518";
 
     const loginDiv = document.getElementById("login");
@@ -265,10 +262,6 @@
     const estadoActual = document.getElementById("estadoActual");
 
     let socket = null;
-
-    // =========================
-    // LOGIN
-    // =========================
 
     function login() {
       const password = document.getElementById("passwordInput").value;
@@ -303,10 +296,6 @@
         agregarLog("Sesión restaurada.", "info");
       }
     }
-
-    // =========================
-    // ENVIAR COMANDOS
-    // =========================
 
     async function enviarComando(comando) {
       const mensaje = document.getElementById("mensaje");
@@ -356,10 +345,6 @@
       enviarComando("REINICIAR_PC");
     }
 
-    // =========================
-    // ESCUCHAR RESPUESTAS
-    // =========================
-
     function iniciarEscucha() {
       if (socket) return;
 
@@ -397,7 +382,6 @@
     function procesarMensaje(message) {
       if (!message) return;
 
-      // Si es JSON enviado por la PC
       if (message.startsWith("{")) {
         try {
           const paquete = JSON.parse(message);
@@ -411,16 +395,13 @@
         }
       }
 
-      // Si es un comando normal
       if (
         message === "ENCENDER_PC" ||
         message === "APAGAR_PC" ||
         message === "REINICIAR_PC" ||
         message === "CANCELAR_APAGADO" ||
         message === "APAGAR_AHORA" ||
-        message === "ESTADO_PC" ||
-        message === "UPS_ON" ||
-        message === "UPS_OFF"
+        message === "ESTADO_PC"
       ) {
         agregarLog("ntfy recibió comando: " + message, "info");
         return;
@@ -450,7 +431,9 @@
       if (paquete.memoriaUsada) html += `<strong>RAM usada:</strong> ${paquete.memoriaUsada} / ${paquete.memoriaTotal}<br>`;
       if (paquete.modoUPS) html += `<strong>Modo UPS:</strong> ${paquete.modoUPS}<br>`;
       if (paquete.apagadoPorUPS) html += `<strong>Apagado UPS:</strong> ${paquete.apagadoPorUPS}<br>`;
+      if (paquete.usuarioCanceloUPS) html += `<strong>Cancelado por usuario:</strong> ${paquete.usuarioCanceloUPS}<br>`;
       if (paquete.segundosSinRed !== undefined) html += `<strong>Segundos sin red:</strong> ${paquete.segundosSinRed}<br>`;
+      if (paquete.tiempoApagadoUPS) html += `<strong>Tiempo apagado UPS:</strong> ${paquete.tiempoApagadoUPS}<br>`;
 
       estadoActual.innerHTML = html;
     }
